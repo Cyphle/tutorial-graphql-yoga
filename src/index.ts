@@ -5,12 +5,14 @@ import { Express } from 'express';
 export const schema = createSchema({
   typeDefs: /* GraphQL */ `
     type Query {
-      hello: String
+      hello: String!
+      name: String!
     }
   `,
   resolvers: {
     Query: {
-      hello: () => 'Hello world pouetpouet!'
+      hello: () => 'Hello world pouetpouet!',
+      name: () => 'John Doe'
     }
   }
 });

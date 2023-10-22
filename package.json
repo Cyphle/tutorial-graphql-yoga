@@ -7,7 +7,7 @@
     "test": "jest",
     "test:cov": "jest --coverage",
     "server:run": "cd dist && node index.js",
-    "server:build": "cd src & tsc",
+    "server:build": "rm -rf dist & cd src & tsc",
     "server": "cd src & tsc & node dist/index.js"
   },
   "author": "",
