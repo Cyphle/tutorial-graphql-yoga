@@ -3,16 +3,22 @@ import { expressConfig } from './config/express.config';
 import { Express } from 'express';
 
 export const schema = createSchema({
-  typeDefs: /* GraphQL */ `
+  typeDefs: `
     type Query {
-      hello: String!
+      id: ID!
       name: String!
+      age: Int!
+      employed: Boolean!
+      gpa: Float
     }
   `,
   resolvers: {
     Query: {
-      hello: () => 'Hello world pouetpouet!',
-      name: () => 'John Doe'
+      id: () => 'abc123',
+      name: () => 'John Doe',
+      age: () => 21,
+      employed: () => true,
+      gpa: () => null
     }
   }
 });

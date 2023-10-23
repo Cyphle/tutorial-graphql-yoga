@@ -8,7 +8,7 @@
     "test:cov": "jest --coverage",
     "server:run": "cd dist && node index.js",
     "server:build": "rm -rf dist & cd src & tsc",
-    "server": "cd src & tsc & node dist/index.js"
+    "server": "rm -rf dist & cd src & tsc & node dist/index.js"
   },
   "author": "",
   "license": "ISC",
