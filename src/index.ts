@@ -5,20 +5,20 @@ import { Express } from 'express';
 export const schema = createSchema({
   typeDefs: `
     type Query {
-      id: ID!
-      name: String!
-      age: Int!
-      employed: Boolean!
-      gpa: Float
+      title: String!
+      price: Float!
+      releaseYear: Int
+      rating: Float
+      inStock: Boolean!
     }
   `,
   resolvers: {
     Query: {
-      id: () => 'abc123',
-      name: () => 'John Doe',
-      age: () => 21,
-      employed: () => true,
-      gpa: () => null
+      title: () => 'The War of Art',
+      price: () => 12.99,
+      releaseYear: () => 2007,
+      rating: () => 5,
+      inStock: () => true
     }
   }
 });
