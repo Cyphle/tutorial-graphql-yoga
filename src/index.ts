@@ -2,11 +2,29 @@ import { createSchema, createYoga } from 'graphql-yoga'
 import { expressConfig } from './config/express.config';
 import { Express } from 'express';
 
+const users = [
+  {
+    id: '1',
+    name: 'Andrew',
+    email: 'andrew@example.com',
+    age: 27
+  },
+  {
+    id: '2',
+    name: 'Sarah',
+    email: 'sarah@example.com'
+  },
+  {
+    id: '3',
+    name: 'Mike',
+    email: 'mike@example.com'
+  }
+];
+
+
 const typeDefs = `
   type Query {
-    greeting(name: String, position: String): String!
-    add(numbers: [Float!]!): Float!
-    grades: [Int!]!
+    users(query: String): [User!]!
     me: User!
     post: Post!
   }
@@ -28,16 +46,14 @@ const typeDefs = `
 
 const resolvers = {
   Query: {
-    greeting(parent: any, args: any, ctx: any, info: any) {
-      return `Hello, ${args.name} World! You are in ${args.position}`;
-    },
-    add(parent: any, args: any, ctx: any, info: any) {
-      return args.numbers.reduce((accumulator: number, currentValue: number) => {
-        return accumulator + currentValue;
-      }, 0.0);
-    },
-    grades(parent: any, args: any, ctx: any, info: any) {
-      return [99, 80, 93];
+    users(parent: any, args: any, ctx: any, info: any) {
+      if (!args.query) {
+        return users;
+      }
+
+      return users.filter((user: any) => {
+        return user.name.toLowerCase().includes(args.query.toLowerCase());
+      });
     },
     me() {
       return {
