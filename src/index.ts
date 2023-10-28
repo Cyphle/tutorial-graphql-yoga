@@ -1,56 +1,16 @@
 import { createSchema, createYoga } from 'graphql-yoga'
 import { expressConfig } from './config/express.config';
 import { Express } from 'express';
-
-const users = [
-  {
-    id: '1',
-    name: 'Andrew',
-    email: 'andrew@example.com',
-    age: 27
-  },
-  {
-    id: '2',
-    name: 'Sarah',
-    email: 'sarah@example.com'
-  },
-  {
-    id: '3',
-    name: 'Mike',
-    email: 'mike@example.com'
-  }
-];
-
-const posts = [
-  {
-    id: '10',
-    title: 'GraphQL 101',
-    body: 'This is how to use GraphQL...',
-    published: true,
-    author: '1'
-  },
-  {
-    id: '11',
-    title: 'GraphQL 201',
-    body: 'This is an advanced GraphQL post...',
-    published: false,
-    author: '1'
-  },
-  {
-    id: '12',
-    title: 'Programming Music',
-    body: '',
-    published: false,
-    author: '2'
-  }
-];
+import { users } from './mocks/users';
+import { posts } from './mocks/posts';
+import { comments } from './mocks/comments';
 
 const typeDefs = `
   type Query {
     users(query: String): [User!]!
     posts(query: String): [Post!]!
+    comments: [Comment!]!
     me: User!
-    post: Post!
   }
   
   type User {
@@ -58,6 +18,8 @@ const typeDefs = `
     name: String!
     email: String!
     age: Int
+    posts: [Post!]!
+    comments: [Comment!]!
   }
   
   type Post {
@@ -66,6 +28,14 @@ const typeDefs = `
     body: String!
     published: Boolean!
     author: User!
+    comments: [Comment!]!
+  }
+  
+  type Comment {
+     id: ID!
+     text: String!
+     author: User!
+     post: Post!
   }
 `;
 
@@ -91,19 +61,14 @@ const resolvers = {
         return isTitleMatch || isBodyMatch;
       });
     },
+    comments(parent: any, args: any, ctx: any, info: any) {
+      return comments;
+    },
     me() {
       return {
         id: '123098',
         name: 'Mike',
         email: 'mike@example.com',
-      }
-    },
-    post() {
-      return {
-        id: '092',
-        title: 'GraphQL 101',
-        body: '',
-        published: false
       }
     }
   },
@@ -111,6 +76,35 @@ const resolvers = {
     author(parent: any, args: any, ctx: any, info: any) {
       return users.find((user: any) => {
         return user.id === parent.author;
+      });
+    },
+    comments(parent: any, args: any, ctx: any, info: any) {
+      return comments.filter((comment: any) => {
+        return comment.post === parent.id;
+      });
+    }
+  },
+  User: {
+    posts(parent: any, args: any, ctx: any, info: any) {
+      return posts.filter((post: any) => {
+        return post.author === parent.id;
+      });
+    },
+    comments(parent: any, args: any, ctx: any, info: any) {
+      return comments.filter((comment: any) => {
+        return comment.author === parent.id;
+      });
+    }
+  },
+  Comment: {
+    author(parent: any, args: any, ctx: any, info: any) {
+      return users.find((user: any) => {
+        return user.id === parent.author;
+      });
+    },
+    post(parent: any, args: any, ctx: any, info: any) {
+      return posts.find((post: any) => {
+        return post.id === parent.post;
       });
     }
   }
