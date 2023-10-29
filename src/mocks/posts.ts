@@ -1,5 +1,4 @@
-export
-const posts = [
+export const posts = [
   {
     id: '10',
     title: 'GraphQL 101',
