@@ -40,6 +40,34 @@ export const Mutation = {
 
     return deletedUsers[0];
   },
+  updateUser(parent: any, args: any, ctx: any, info: any) {
+    const { id, data } = args;
+    const user = ctx.db.users.find((user: any) => user.id === id);
+
+    if (!user) {
+      throw new Error('User not found.');
+    }
+
+    if (typeof data.email === 'string') {
+      const emailTaken = ctx.db.users.some((user: any) => user.email === data.email);
+
+      if (emailTaken) {
+        throw new Error('Email taken.');
+      }
+
+      user.email = data.email;
+    }
+
+    if (typeof data.name === 'string') {
+      user.name = data.name;
+    }
+
+    if (typeof data.age !== 'undefined') {
+      user.age = data.age;
+    }
+
+    return user;
+  },
   createPost(parent: any, args: any, ctx: any, info: any) {
     const userExists = ctx.db.users.some((user: any) => user.id === args.author);
 
@@ -68,6 +96,55 @@ export const Mutation = {
 
     return deletedPosts[0];
   },
+  updatePost(parent: any, args: any, ctx: any, info: any) {
+    const { id, data } = args;
+    const post = ctx.db.posts.find((post: any) => post.id === id);
+    const originalPost = { ...post };
+
+    if (!post) {
+      throw new Error('Post not found.');
+    }
+
+    if (typeof data.title === 'string') {
+      post.title = data.title;
+    }
+
+    if (typeof data.body === 'string') {
+      post.body = data.body;
+    }
+
+    if (typeof data.published === 'boolean') {
+      post.published = data.published;
+
+      if (originalPost.published && !post.published) {
+        // deleted
+        ctx.pubsub.publish('post', {
+          post: {
+            mutation: 'DELETED',
+            data: originalPost
+          }
+        });
+      } else if (!originalPost.published && post.published) {
+        // created
+        ctx.pubsub.publish('post', {
+          post: {
+            mutation: 'CREATED',
+            data: post
+          }
+        });
+      }
+    } else if (post.published) {
+      // updated
+      ctx.pubsub.publish('post', {
+        post: {
+          mutation: 'UPDATED',
+          data: post
+        }
+      });
+    }
+
+    return post;
+  },
   createComment(parent: any, args: any, ctx: any, info: any) {
     const userExists = ctx.db.users.some((user: any) => user.id === args.author);
     const postExists = ctx.db.posts.some((post: any) => post.id === args.post && post.published);
@@ -94,5 +171,19 @@ export const Mutation = {
     const deletedComments = ctx.db.comments.splice(commentIndex, 1);
 
     return deletedComments[0];
+  },
+  updateComment(parent: any, args: any, ctx: any, info: any) {
+    const { id, data } = args;
+    const comment = ctx.db.comments.find((comment: any) => comment.id === id);
+
+    if (!comment) {
+      throw new Error('Comment not found.');
+    }
+
+    if (typeof data.text === 'string') {
+      comment.text = data.text;
+    }
+
+    return comment;
   }
 }

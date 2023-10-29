@@ -1,4 +1,4 @@
-import { createSchema, createYoga } from 'graphql-yoga'
+import { createSchema, createYoga } from 'graphql-yoga';
 import { expressConfig } from './config/express.config';
 import { Express } from 'express';
 import * as path from 'path';
