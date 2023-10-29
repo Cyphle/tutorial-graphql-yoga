@@ -4,6 +4,7 @@ import { Express } from 'express';
 import { users } from './mocks/users';
 import { posts } from './mocks/posts';
 import { comments } from './mocks/comments';
+import { v4 as uuidv4 } from 'uuid';
 
 const typeDefs = `
   type Query {
@@ -11,6 +12,10 @@ const typeDefs = `
     posts(query: String): [Post!]!
     comments: [Comment!]!
     me: User!
+  }
+  
+  type Mutation {
+    createUser(name: String!, email: String!, age: Int): User!
   }
   
   type User {
@@ -70,6 +75,26 @@ const resolvers = {
         name: 'Mike',
         email: 'mike@example.com',
       }
+    }
+  },
+  Mutation: {
+    createUser(parent: any, args: any, ctx: any, info: any) {
+      const emailTaken = users.some((user: any) => user.email === args.email);
+
+      if (emailTaken) {
+        throw new Error('Email taken.');
+      }
+
+      const user = {
+        id: uuidv4(),
+        name: args.name,
+        email: args.email,
+        age: args.age
+      };
+
+      users.push(user);
+
+      return user;
     }
   },
   Post: {
