@@ -21,5 +21,16 @@ export const Subscription = {
 
       return ctx.pubSub.subscribe('count');
     }
+  },
+  comment: {
+    subscribe: (parent: any, { postId }: any, ctx: any, info: any) => {
+      const post = ctx.db.posts.find((post: any) => post.id === postId);
+
+      if (!post) {
+        throw new Error('Post not found');
+      }
+
+      return ctx.pubSub.subscribe(`comment ${postId}`);
+    }
   }
 }

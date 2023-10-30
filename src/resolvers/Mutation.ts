@@ -147,7 +147,7 @@ export const Mutation = {
   },
   createComment(parent: any, args: any, ctx: any, info: any) {
     const userExists = ctx.db.users.some((user: any) => user.id === args.author);
-    const postExists = ctx.db.posts.some((post: any) => post.id === args.post && post.published);
+    const postExists = ctx.db.posts.some((post: any) => post.id === args.post);
 
     if (!userExists || !postExists) {
       throw new Error('Unable to find user and post.');
@@ -158,6 +158,11 @@ export const Mutation = {
       ...args.data
     }
     ctx.db.comments.push(comment);
+
+
+    ctx.pubSub.publish(`comment ${args.data.post}`, {
+      comment
+    });
 
     return comment;
   },
