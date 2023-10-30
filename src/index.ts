@@ -1,4 +1,4 @@
-import { createSchema, createYoga } from 'graphql-yoga';
+import { createSchema, createYoga, PubSub } from 'graphql-yoga';
 import { expressConfig } from './config/express.config';
 import { Express } from 'express';
 import * as path from 'path';
@@ -9,6 +9,7 @@ import { Mutation } from './resolvers/Mutation';
 import { Post } from './resolvers/Post';
 import { User } from './resolvers/User';
 import { Comment } from './resolvers/Comment';
+import { Subscription } from './resolvers/Subscription';
 
 export const schema = createSchema({
   typeDefs: fs.readFileSync(
@@ -18,6 +19,7 @@ export const schema = createSchema({
   resolvers: {
     Query,
     Mutation,
+    Subscription,
     Post,
     User,
     Comment
