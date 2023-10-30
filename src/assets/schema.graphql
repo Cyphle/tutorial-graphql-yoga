@@ -21,6 +21,7 @@ type Mutation {
 
 type Subscription {
     countdown(from: Int!): Int!
+    count: Int!
 }
 
 input CreateUserInput {

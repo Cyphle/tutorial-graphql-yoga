@@ -7,5 +7,19 @@ export const Subscription = {
         yield { countdown: i }
       }
     }
+  },
+  count: {
+    subscribe: (parent: any, args: any, ctx: any, info: any) => {
+      let count = 0;
+
+      setInterval(() => {
+        count++;
+        ctx.pubSub.publish('count', {
+          count
+        });
+      }, 1000);
+
+      return ctx.pubSub.subscribe('count');
+    }
   }
 }
