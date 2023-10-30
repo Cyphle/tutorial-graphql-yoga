@@ -32,5 +32,10 @@ export const Subscription = {
 
       return ctx.pubSub.subscribe(`comment ${postId}`);
     }
+  },
+  post: {
+    subscribe: (parent: any, args: any, ctx: any, info: any) => {
+      return ctx.pubSub.subscribe('post');
+    }
   }
 }
