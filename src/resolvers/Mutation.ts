@@ -179,7 +179,10 @@ export const Mutation = {
 
 
     ctx.pubSub.publish(`comment ${args.data.post}`, {
-      comment
+      comment: {
+        mutation: 'CREATED',
+        data: comment
+      }
     });
 
     return comment;
@@ -192,6 +195,13 @@ export const Mutation = {
     }
 
     const deletedComments = ctx.db.comments.splice(commentIndex, 1);
+
+    ctx.pubSub.publish(`comment ${deletedComments[0].post}`, {
+      comment: {
+        mutation: 'DELETED',
+        data: deletedComments[0]
+      }
+    });
 
     return deletedComments[0];
   },
@@ -206,6 +216,13 @@ export const Mutation = {
     if (typeof data.text === 'string') {
       comment.text = data.text;
     }
+
+    ctx.pubSub.publish(`comment ${comment.post}`, {
+      comment: {
+        mutation: 'UPDATED',
+        data: comment
+      }
+    });
 
     return comment;
   }
