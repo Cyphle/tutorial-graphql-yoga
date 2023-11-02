@@ -10,8 +10,10 @@ import { Post } from './resolvers/Post';
 import { User } from './resolvers/User';
 import { Comment } from './resolvers/Comment';
 import { Subscription } from './resolvers/Subscription';
+import { PrismaClient } from '@prisma/client';
 
 const pubSub = createPubSub();
+const prisma = new PrismaClient();
 
 export const schema = createSchema({
   typeDefs: fs.readFileSync(
@@ -37,8 +39,29 @@ const yoga = createYoga({
   }
 });
 
+
+async function main() {
+  const user = await prisma.user.create({
+    data: {
+      name: 'Alice',
+      email: 'alice@prisma.io',
+    },
+  })
+  console.log(user)
+}
+
 const launchServer = (app: Express) => {
-  app.use(yoga.graphqlEndpoint, yoga)
+  app.use(yoga.graphqlEndpoint, yoga);
+
+  main()
+      .then(async () => {
+        await prisma.$disconnect()
+      })
+      .catch(async (e) => {
+        console.error(e)
+        await prisma.$disconnect()
+        process.exit(1)
+      })
 }
 
 (function main() {
