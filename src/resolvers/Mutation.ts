@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 export const Mutation = {
-  createUser(parent: any, args: any, ctx: any, info: any) {
+  createUser: async (parent: any, args: any, ctx: any, info: any) => {
     const emailTaken = ctx.db.users.some((user: any) => user.email === args.email);
 
     if (emailTaken) {
@@ -14,6 +14,11 @@ export const Mutation = {
     };
 
     ctx.db.users.push(user);
+    await ctx.prisma.user.create({
+      data: {
+        ...args.data
+      },
+    });
 
     return user;
   },
