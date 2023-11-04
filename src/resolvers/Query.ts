@@ -1,12 +1,10 @@
 export const Query = {
-  users(parent: any, args: any, ctx: any, info: any) {
+  users: async (parent: any, args: any, ctx: any, info: any) => {
     if (!args.query) {
-      return ctx.db.users;
+      return ctx.prisma.user.findMany({});
     }
 
-    return ctx.db.users.filter((user: any) => {
-      return user.name.toLowerCase().includes(args.query.toLowerCase());
-    });
+    return ctx.prisma.user.findMany({});
   },
   posts(parent: any, args: any, ctx: any, info: any) {
     if (!args.query) {

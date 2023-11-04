@@ -22,7 +22,7 @@ export const Mutation = {
 
     return user;
   },
-  deleteUser(parent: any, args: any, ctx: any, info: any) {
+  deleteUser: async (parent: any, args: any, ctx: any, info: any) => {
     const userIndex = ctx.db.users.findIndex((user: any) => user.id === args.id);
 
     if (userIndex === -1) {
@@ -43,7 +43,11 @@ export const Mutation = {
 
     ctx.db.comments = ctx.db.comments.filter((comment: any) => comment.author !== args.id);
 
-    return deletedUsers[0];
+    const user = await ctx.prisma.user.delete({
+      where: { id: parseInt(args.id) },
+    })
+
+    return user;
   },
   updateUser(parent: any, args: any, ctx: any, info: any) {
     const { id, data } = args;
