@@ -1,9 +1,17 @@
 export const Query = {
   users: async (parent: any, args: any, ctx: any, info: any) => {
+    const requestForPosts = info
+        .fieldNodes
+        .find((node: any) => node.name.value === 'users')
+        ?.selectionSet
+        .selections
+        .map((selection: any) => selection.name.value)
+        .includes('posts');
+
     if (!args.query) {
       let findMany1 = await ctx.prisma.user.findMany({
         include: {
-          posts: true
+          posts: requestForPosts
         },
       });
 
