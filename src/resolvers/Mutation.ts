@@ -2,8 +2,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 export const Mutation = {
   createUser: async (parent: any, args: any, ctx: any, info: any) => {
-    const emailTaken = await ctx.prisma.users.findUnique({
-      where: { email: args.email }
+    const emailTaken = await ctx.prisma.user.findUnique({
+      where: { email: args.data.email }
     });
 
     if (emailTaken) {
@@ -71,29 +71,42 @@ export const Mutation = {
 
     return user;
   },
-  createPost(parent: any, args: any, ctx: any, info: any) {
-    const userExists = ctx.db.users.some((user: any) => user.id === args.author);
+  createPost: async (parent: any, args: any, ctx: any, info: any) => {
+    const userExists = await ctx.prisma.user.findUnique({
+      where: { id: parseInt(args.data.author) }
+    });
 
     if (!userExists) {
       throw new Error('User not found.');
     }
 
-    const post = {
-      id: uuidv4(),
-      ...args.data
-    };
-    ctx.db.posts.push(post);
+    // const post = {
+    //   ...args.data
+    // };
+    // ctx.db.posts.push(post);
+    //
+    // if (post.published) {
+    //   ctx.pubsub.publish('post', {
+    //     post: {
+    //       mutation: 'CREATED',
+    //       data: post
+    //     }
+    //   });
+    // }
 
-    if (post.published) {
-      ctx.pubsub.publish('post', {
-        post: {
-          mutation: 'CREATED',
-          data: post
+    let createdPost = ctx.prisma.post.create({
+      data: {
+        title: args.data.title,
+        published: args.data.published,
+        content: args.data.content,
+        author: {
+          connect: {
+            id: userExists.id
+          }
         }
-      });
-    }
-
-    return post;
+      },
+    });
+    return createdPost;
   },
   deletePost(parent: any, args: any, ctx: any, info: any) {
     const postIndex = ctx.db.posts.findIndex((post: any) => post.id === args.id);
@@ -130,8 +143,8 @@ export const Mutation = {
       post.title = data.title;
     }
 
-    if (typeof data.body === 'string') {
-      post.body = data.body;
+    if (typeof data.content === 'string') {
+      post.content = data.content;
     }
 
     if (typeof data.published === 'boolean') {
@@ -181,7 +194,7 @@ export const Mutation = {
     ctx.db.comments.push(comment);
 
 
-    ctx.pubSub.publish(`comment ${args.data.post}`, {
+    ctx.pubSub.publish(`comment ${ args.data.post }`, {
       comment: {
         mutation: 'CREATED',
         data: comment
@@ -199,7 +212,7 @@ export const Mutation = {
 
     const deletedComments = ctx.db.comments.splice(commentIndex, 1);
 
-    ctx.pubSub.publish(`comment ${deletedComments[0].post}`, {
+    ctx.pubSub.publish(`comment ${ deletedComments[0].post }`, {
       comment: {
         mutation: 'DELETED',
         data: deletedComments[0]
@@ -220,7 +233,7 @@ export const Mutation = {
       comment.text = data.text;
     }
 
-    ctx.pubSub.publish(`comment ${comment.post}`, {
+    ctx.pubSub.publish(`comment ${ comment.post }`, {
       comment: {
         mutation: 'UPDATED',
         data: comment

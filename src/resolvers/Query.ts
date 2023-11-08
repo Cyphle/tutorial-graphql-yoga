@@ -1,10 +1,16 @@
 export const Query = {
   users: async (parent: any, args: any, ctx: any, info: any) => {
     if (!args.query) {
-      return ctx.prisma.user.findMany({});
+      let findMany1 = await ctx.prisma.user.findMany({
+        include: {
+          posts: true
+        },
+      });
+
+      return findMany1;
     }
 
-    return ctx.prisma.user.findMany({
+    let findMany = await ctx.prisma.user.findMany({
       where: {
         name: {
           contains: args.query,
@@ -12,6 +18,9 @@ export const Query = {
         }
       }
     });
+
+    console.log(findMany);
+    return findMany;
   },
   posts: async (parent: any, args: any, ctx: any, info: any) => {
     if (!args.query) {
